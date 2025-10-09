@@ -9,6 +9,7 @@ const ownerSchema = mongoose.Schema({
         minLength:3
     },
     email:String,
+    password:String,
     cart:{
         type:Array,
         default:[]

@@ -20,7 +20,9 @@
   "homepage": "https://github.com/Ywatch15/ScatchProject#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "config": "^4.1.1",
     "cookie-parser": "^1.4.7",
+    "debug": "^4.4.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1"
