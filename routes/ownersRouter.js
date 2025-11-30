@@ -3,27 +3,43 @@ const express = require('express');
 const router = express.Router();
 const ownerModel = require('../models/owner-model')
 
-if(process.env.NODE_ENV==='development'){
-    router.post('/create', async (req,res)=>{
+// Allow owner creation in development OR when explicitly enabled via env var.
+// This registers the route unconditionally but enforces a runtime check so
+// the endpoint exists (avoids "Cannot POST /owners/create"), while still
+// preventing accidental owner creation in production.
+router.post('/create', async (req, res) => {
+    const allowCreate = (process.env.NODE_ENV === 'development') || (process.env.ALLOW_OWNER_CREATE === 'true');
+    if (!allowCreate) {
+        return res.status(403).send("Owner creation is disabled in this environment");
+    }
+
+    try {
         let owners = await ownerModel.find();
-        if(owners.length>0) {
-            return res.send(503).send("U don't have a permission to create a new owner");
+        if (owners.length > 0) {
+            return res.status(403).send("You don't have permission to create a new owner");
         }
 
-        let {fullname,email,password} = req.body;
+        let { fullname, email, password } = req.body;
+        if (!fullname || !email || !password) {
+            return res.status(400).send('fullname, email and password are required');
+        }
 
         let createdOwner = await ownerModel.create({
             fullname,
             email,
             password,
-        })
+        });
 
-        res.status(203).send(createdOwner)
-    })
-}
+        res.status(201).json(createdOwner);
+    } catch (err) {
+        console.error('Error creating owner:', err);
+        res.status(500).send('Internal server error');
+    }
+});
 
-router.get('/',(req,res)=>{
-    res.send('hey');
+router.get('/admin',(req,res)=>{
+    const success = req.flash ? req.flash('success') : [];
+    res.render('createproducts', { success });
 })
 
 

@@ -1,6 +1,7 @@
 <%- include('./partials/header') %>
   
-    <% if(success.length>0){ %>
+    <% var success = (typeof success !== 'undefined') ? success : []; %>
+    <% if (Array.isArray(success) && success.length > 0) { %>
         <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
             <span class="inline-block mt-1 mb-1 text-white">
                 <%= success %>

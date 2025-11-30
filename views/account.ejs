@@ -1,0 +1,39 @@
+<%- include('./partials/header') %>
+
+<div class="max-w-3xl mx-auto p-8">
+  <h2 class="text-2xl font-semibold mb-4">My Account</h2>
+
+  <% if (Array.isArray(success) && success.length) { %>
+    <div class="mb-4 p-3 bg-green-500 text-white rounded"><%= success[0] %></div>
+  <% } %>
+
+  <div class="bg-white shadow rounded p-6">
+    <h3 class="text-lg font-medium mb-2">Profile</h3>
+    <p><strong>Name:</strong> <%= user.fullname %></p>
+    <p><strong>Email:</strong> <%= user.email %></p>
+
+    <form method="post" action="/account" class="mt-4">
+      <label class="block mb-2">Phone</label>
+      <input name="contact" type="text" value="<%= user.contact || '' %>" class="border p-2 rounded w-full mb-3" placeholder="Enter phone number">
+      <div class="flex gap-3">
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Save</button>
+        <a href="/shop" class="px-4 py-2 border rounded">Back to shop</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-6">
+    <h3 class="text-lg font-medium mb-2">Orders</h3>
+    <% if (user.orders && user.orders.length) { %>
+      <ul class="list-disc pl-6">
+        <% user.orders.forEach(function(o){ %>
+          <li>Order #<%= o.id || o._id %> — <%= o.status || 'N/A' %> — ₹<%= o.total || 0 %></li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No orders yet.</p>
+    <% } %>
+  </div>
+</div>
+
+<%- include('./partials/footer') %>

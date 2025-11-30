@@ -9,7 +9,8 @@ const productsRouter = require('./routes/productsRouter')
 const indexRouter = require('./routes/index')
 const expressSession = require('express-session')
 const flash = require('connect-flash')
-
+// const crypto = require('crypto');
+// const sessionSecret = crypto.randomBytes(32).toString('hex');
 
 require ('dotenv').config()
 
@@ -26,6 +27,13 @@ app.use(expressSession({
 }))
 
 app.use(flash())
+// expose flash messages and logged-in state to all views
+app.use((req, res, next) => {
+    res.locals.success = req.flash ? req.flash('success') : [];
+    res.locals.error = req.flash ? req.flash('error') : [];
+    res.locals.loggedin = !!(req.cookies && req.cookies.token);
+    next();
+});
 app.use("/", indexRouter)
 app.use('/owners', ownersRouter)
 app.use('/users', usersRouter)
