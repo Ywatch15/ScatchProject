@@ -1,4 +1,3 @@
-// Author: Ywatch15
 const mongoose = require('mongoose');
 
 

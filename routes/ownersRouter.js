@@ -1,12 +1,8 @@
-// Author: Ywatch15
 const express = require('express');
 const router = express.Router();
 const ownerModel = require('../models/owner-model')
 
-// Allow owner creation in development OR when explicitly enabled via env var.
-// This registers the route unconditionally but enforces a runtime check so
-// the endpoint exists (avoids "Cannot POST /owners/create"), while still
-// preventing accidental owner creation in production.
+
 router.post('/create', async (req, res) => {
     const allowCreate = (process.env.NODE_ENV === 'development') || (process.env.ALLOW_OWNER_CREATE === 'true');
     if (!allowCreate) {

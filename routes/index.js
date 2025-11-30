@@ -16,21 +16,20 @@ router.get("/", (req,res)=>{
 
 router.get('/shop', isLoggedin, async (req, res) => {
   try {
-    // Load only products created/stored in the database (owners/admin)
     const docs = await productModel.find({}).lean();
     const products = docs.map((p) => ({
       _id: p._id,
       name: p.name,
       price: p.price,
-      image: p.image, // Buffer or undefined
-      imageUrl: p.imageUrl, // in case you store URLs in future
+      image: p.image, 
+      imageUrl: p.imageUrl, 
       bgcolor: p.bgcolor || '#f3f4f6',
       panelcolor: p.panelcolor || '#ffffff',
       textcolor: p.textcolor || '#111827',
       discount: p.discount || 0,
     }));
     const success = req.flash ? req.flash('success') : [];
-    req.flash && req.flash('success'); // ensure flash is initialized
+    req.flash && req.flash('success'); 
     res.render('shop', { products, user: req.user, success });
   } catch (err) {
     console.error('Error loading products for shop:', err);
@@ -40,7 +39,6 @@ router.get('/shop', isLoggedin, async (req, res) => {
   }
 });
 router.get('/cart', async (req, res) => {
-  // Render the user's cart if logged in; otherwise redirect to index with a flash
   if (!req.cookies || !req.cookies.token) {
     req.flash('error', 'You need to login first');
     return res.redirect('/');
@@ -53,7 +51,6 @@ router.get('/cart', async (req, res) => {
       req.flash('error', 'You need to login first');
       return res.redirect('/');
     }
-      // Aggregate cart items to compute quantities: user.cart is an array of product docs
       const map = new Map();
       if (Array.isArray(user.cart)) {
         user.cart.forEach((p) => {
@@ -63,7 +60,6 @@ router.get('/cart', async (req, res) => {
         });
       }
       const cartItems = Array.from(map.values());
-      // compute bill as sum of qty * price (subtract discount if present per-item)
       const bill = cartItems.reduce((sum, it) => {
         const price = Number(it.product.price) || 0;
         const discount = Number(it.product.discount) || 0;
@@ -79,7 +75,6 @@ router.get('/cart', async (req, res) => {
   }
 });
 
-// Increment quantity (add one occurrence of product to user's cart)
 router.get('/cart/increment/:id', isLoggedin, async (req, res) => {
   try {
     const user = await userModel.findOne({ email: req.user.email });
