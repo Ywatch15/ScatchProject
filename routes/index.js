@@ -7,8 +7,10 @@ const jwt = require('jsonwebtoken');
 
 
 router.get("/", (req,res)=>{
-  let err = req.flash("error");
-    res.render("index", { error: err, loggedin:false });
+  const error = res.locals.error || [];
+  const success = res.locals.success || [];
+  const loggedin = !!res.locals.loggedin;
+    res.render("index", { error, success, loggedin });
 })
 
 

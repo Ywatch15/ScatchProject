@@ -4,32 +4,35 @@ const jwt = require('jsonwebtoken');
 const generatedToken = require('../utils/generatedToken');
 
 module.exports.registeredUser = async (req, res) => {
-    try{
-        let {email, password, fullname} = req.body;
+    try {
+        const { email, password, fullname } = req.body;
 
-        let user=await userModel.findOne({email:email})
-        if(user) return res.status(401).send("You are already registered");
+        if (!email || !password || !fullname) {
+            req.flash('error', 'All fields are required');
+            return res.redirect('/');
+        }
 
-        bcrypt.genSalt(10, (err,salt)=>{
-            bcrypt.hash(password, salt, async function(err,hash){
-                if(err) return res.send(err.message);
-                else {
-                    let user = await userModel.create({
-                    email,
-                    password:hash,
-                    fullname,
-                    });
+        const existing = await userModel.findOne({ email });
+        if (existing) {
+            req.flash('error', 'You are already registered');
+            return res.redirect('/');
+        }
 
-                    let token = generatedToken(user)
-                    res.cookie("token",token)
-                    res.send("user created successfully");
-                }
+        const hash = await bcrypt.hash(password, 10);
+        const user = await userModel.create({
+            email,
+            password: hash,
+            fullname,
+        });
 
-            })
-        })
-        
-    } catch(err){
-        res.send(err.message);   
+        const token = generatedToken(user);
+        res.cookie('token', token);
+        req.flash('success', 'Account created successfully');
+        return res.redirect('/');
+    } catch (err) {
+        console.error('Error registering user:', err);
+        req.flash('error', 'Could not create user');
+        return res.redirect('/');
     }
 }
 
