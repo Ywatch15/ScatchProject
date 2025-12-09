@@ -1,0 +1,121 @@
+<%- include('./partials/header') %>
+
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-white via-white to-slate-100"></div>
+  <div class="absolute -top-16 left-10 w-72 h-72 bg-brand/10 blur-3xl rounded-full"></div>
+
+  <div class="relative max-w-6xl mx-auto px-6 py-12 space-y-10">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium text-brand uppercase tracking-[0.3em]">
+          Cart
+        </p>
+        <h1 class="text-3xl font-semibold text-slate-900">Review your items</h1>
+        <p class="text-slate-600">Update quantities before you place the order.</p>
+      </div>
+      <a href="/shop" class="inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-700 hover:border-brand hover:text-brand">
+        <i class="ri-arrow-left-line"></i>
+        Continue shopping
+      </a>
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
+      <div class="space-y-4">
+        <% if (Array.isArray(cart) && cart.length) { %>
+          <% cart.forEach(function(item){ %>
+            <% var product = item.product; var qty = item.qty; %>
+            <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 flex flex-col gap-4 shadow-sm">
+              <% if (product) { %>
+                <% var bg = product.bgcolor ? product.bgcolor : '#eef2ff'; %>
+                <% var text = product.textcolor ? product.textcolor : '#0f172a'; %>
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <div class="w-full sm:w-32 h-36 flex items-center justify-center rounded-2xl" <%= `style="background-color:${bg};"` %>>
+                    <% if (product.imageUrl) { %>
+                      <img class="h-28 object-contain" src="<%= product.imageUrl %>" alt="<%= product.name %>">
+                    <% } else if (product.image) { %>
+                      <img class="h-28 object-contain" src="data:image/jpeg;base64,<%= product.image.toString('base64') %>" alt="<%= product.name %>">
+                    <% } else { %>
+                      <img class="h-24 object-contain" src="/images/placeholder.png" alt="placeholder">
+                    <% } %>
+                  </div>
+                  <div class="flex-1 space-y-1">
+                    <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Owner pick</p>
+                    <h3 class="text-xl font-semibold text-slate-900"><%= product.name %></h3>
+                    <p class="text-sm text-slate-500">Colorway based on owner palette.</p>
+                    <div class="flex items-baseline gap-3">
+                      <% var itemPrice = Number(product.price || 0); %>
+                      <% var itemDiscount = Number(product.discount || 0); %>
+                      <span class="text-2xl font-semibold text-slate-900">₹ <%= Math.max(itemPrice - itemDiscount, 0) %></span>
+                      <% if (itemDiscount) { %>
+                        <span class="text-sm text-slate-500 line-through">₹ <%= itemPrice %></span>
+                      <% } %>
+                    </div>
+                  </div>
+                  <div class="text-right flex flex-col gap-3">
+                    <div class="flex items-center justify-end gap-2">
+                      <a href="/cart/decrement/<%= product._id %>" class="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-lg hover:border-slate-900">-</a>
+                      <div class="px-4 py-2 rounded-full bg-slate-100 font-semibold tracking-widest text-slate-700">
+                        <%= qty.toString().padStart(2,'0') %>
+                      </div>
+                      <a href="/cart/increment/<%= product._id %>" class="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-lg hover:border-slate-900">+</a>
+                    </div>
+                    <p class="text-sm text-slate-500">Subtotal</p>
+                    <p class="text-lg font-semibold text-emerald-600">₹ <%= (Math.max(itemPrice - itemDiscount, 0) * qty).toFixed(2) %></p>
+                  </div>
+                </div>
+              <% } else { %>
+                <div class="text-center text-slate-500">
+                  <p class="font-semibold text-slate-800">Product unavailable</p>
+                  <p class="text-sm">This product has been removed by the owner.</p>
+                </div>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-10 text-center text-slate-500">
+            Your cart is empty. Add products from the shop to see them here.
+          </div>
+        <% } %>
+      </div>
+
+      <div class="rounded-3xl border border-slate-200 bg-white/90 p-6 space-y-6 h-fit shadow-sm">
+        <div>
+          <h3 class="text-xl font-semibold text-slate-900">Price breakdown</h3>
+          <p class="text-sm text-slate-500">All prices include taxes.</p>
+        </div>
+        <div class="space-y-3 text-sm text-slate-600">
+          <div class="flex justify-between">
+            <span>Total MRP</span>
+            <% var totalMRP = (Array.isArray(cart) ? cart.reduce((s,it)=> s + (Number((it.product && it.product.price) || 0) * it.qty), 0) : 0); %>
+            <span>₹ <%= totalMRP.toFixed(2) %></span>
+          </div>
+          <div class="flex justify-between">
+            <span>Discount on MRP</span>
+            <% var totalDiscount = (Array.isArray(cart) ? cart.reduce((s,it)=> s + (Number((it.product && it.product.discount) || 0) * it.qty), 0) : 0); %>
+            <span class="text-emerald-600">- ₹ <%= totalDiscount.toFixed(2) %></span>
+          </div>
+          <div class="flex justify-between">
+            <span>Platform fee</span>
+            <span>₹ 20.00</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Shipping fee</span>
+            <span class="text-emerald-600">FREE</span>
+          </div>
+        </div>
+        <div class="border-t border-slate-200 pt-4 flex items-center justify-between">
+          <p class="text-lg font-semibold text-slate-900">Total amount</p>
+          <p class="text-2xl font-semibold text-emerald-600">₹ <%= Number(bill || 0).toFixed(2) %></p>
+        </div>
+        <form action="" method="post" class="space-y-3">
+          <button type="button" class="w-full rounded-2xl bg-brand py-3 text-white font-medium hover:bg-brandDark disabled:bg-slate-300" <%= Array.isArray(cart) && cart.length ? '' : 'disabled' %>>
+            Proceed to checkout
+          </button>
+          <p class="text-xs text-slate-500 text-center">Checkout flow coming soon.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('./partials/footer') %>

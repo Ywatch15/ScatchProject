@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#2563eb',
+                        brandDark: '#1d4ed8',
+                        paper: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #2563eb, #38bdf8);
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity .2s ease, transform .2s ease;
+        }
+        .nav-link:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+    <div class="min-h-screen flex flex-col">
+        <nav class="sticky top-0 inset-x-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+            <div class="max-w-6xl mx-auto flex items-center justify-between px-6 py-3">
+                <a href="/" class="text-2xl font-semibold tracking-tight text-slate-900">
+                    Scatch
+                </a>
+                <% const isLogged = typeof loggedin !== 'undefined' ? loggedin : false; %>
+                <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <% if (isLogged) { %>
+                        <a class="nav-link" href="/shop">Shop</a>
+                        <a class="nav-link" href="/cart">Cart</a>
+                        <a class="nav-link" href="/account">My Account</a>
+                        <a class="px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100" href="/users/logout">Logout</a>
+                    <% } else { %>
+                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="/shop">Shop</a>
+                        <a class="px-4 py-1.5 rounded-full bg-brand text-white" href="/">Login / Sign up</a>
+                    <% } %>
+                </div>
+                <button class="md:hidden text-slate-900 text-2xl" onclick="document.getElementById('mobileNav').classList.toggle('hidden')">
+                    <i class="ri-menu-line"></i>
+                </button>
+            </div>
+            <div id="mobileNav" class="md:hidden hidden border-t border-slate-200 bg-white">
+                <div class="px-6 py-4 flex flex-col gap-3 text-sm font-medium">
+                    <% if (isLogged) { %>
+                        <a class="nav-link" href="/shop">Shop</a>
+                        <a class="nav-link" href="/cart">Cart</a>
+                        <a class="nav-link" href="/account">My Account</a>
+                        <a class="text-rose-600" href="/users/logout">Logout</a>
+                    <% } else { %>
+                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="/shop">Shop</a>
+                        <a class="text-brand" href="/">Login / Sign up</a>
+                    <% } %>
+                </div>
+            </div>
+        </nav>
+        <% const flashSuccess = (typeof success !== 'undefined') ? success : ([]);
+           const flashError = (typeof error !== 'undefined') ? error : ([]);
+        %>
+        <% if (Array.isArray(flashSuccess) && flashSuccess.length) { %>
+            <div class="max-w-6xl mx-auto mt-4 px-6">
+                <div class="rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3">
+                    <%= flashSuccess.join(', ') %>
+                </div>
+            </div>
+        <% } %>
+        <% if (Array.isArray(flashError) && flashError.length) { %>
+            <div class="max-w-6xl mx-auto mt-4 px-6">
+                <div class="rounded-md bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3">
+                    <%= flashError.join(', ') %>
+                </div>
+            </div>
+        <% } %>
+        <main class="flex-1">
